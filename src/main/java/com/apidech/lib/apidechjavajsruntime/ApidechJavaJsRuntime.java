@@ -45,13 +45,13 @@ public class ApidechJavaJsRuntime {
                 .build());
 	}
 	
-	public void singleEval(File jsCode) throws IOException {
+	public void singleEval(JsRunnable runnable, File jsCode) throws IOException {
 		JsSource source = null;
 		source = createSource(jsCode);
-		singleEval(source);
+		singleEval(runnable, source);
 	}
 	
-	public void singleEval(CharSequence jsCode) {
+	public void singleEval(JsRunnable runnable, CharSequence jsCode) {
 		JsSource source = null;
 		try {
 			source = createSource(jsCode);
@@ -60,10 +60,10 @@ public class ApidechJavaJsRuntime {
 			e.printStackTrace();
 		}
 		// Need to find better way to return result since it's need to close context.
-		singleEval(source);
+		singleEval(runnable, source);
 	}
 	
-	public void singleEval(JsSource source) {
+	public void singleEval(JsRunnable runnable, JsSource source) {
 		JsContext context = createContext();
 		JsResult jsResult = new JsResult();
 		try {
@@ -73,11 +73,16 @@ public class ApidechJavaJsRuntime {
 		catch (PolyglotException e) {
 			jsResult.exception = e;
 		}
+		
+		try {
+			runnable.run(jsResult);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 		finally {
 			context.close();
 		}
-		// Need to find better way to return result since it's need to close context.
-//		return jsResult;
 	}
 	
 	//Setup Context allow to define option for example .js lookup
@@ -87,7 +92,6 @@ public class ApidechJavaJsRuntime {
 	//Function Lookup and tools
 	
 	//Create Source
-	
 	
 	/*
 	 * Find the smartway to capture the console output, maybe callback?
