@@ -1,5 +1,8 @@
 package com.apidech.lib.apidechjavajsruntime;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.graalvm.polyglot.Source;
 
 public class JsSource {
@@ -12,5 +15,24 @@ public class JsSource {
 	
 	public Source getSource() {
 		return source;
+	}
+	
+	public static JsSource create(File jsFile) throws IOException {
+		System.out.println("create: "+jsFile.getAbsolutePath());
+		return new JsSource(Source.newBuilder("js", jsFile).build());
+	}
+	
+	public static JsSource create(CharSequence jsCode) {
+		try {
+			return create(jsCode, null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		//Should not be here at all, since no I/O
+		return null;
+	}
+	
+	public static JsSource create(CharSequence jsCode, String name) throws IOException {
+		return new JsSource(Source.newBuilder("js", jsCode, name).build());
 	}
 }

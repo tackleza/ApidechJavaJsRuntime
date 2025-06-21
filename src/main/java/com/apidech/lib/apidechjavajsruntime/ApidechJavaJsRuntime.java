@@ -9,7 +9,6 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.Engine.Builder;
 import org.graalvm.polyglot.PolyglotException;
-import org.graalvm.polyglot.Source;
 
 public class ApidechJavaJsRuntime {
 	
@@ -30,8 +29,8 @@ public class ApidechJavaJsRuntime {
 	}
 	
 	//Create Context
-	public JsContext createContext(File codeDirectory) {
-		return new JsContext(Context.newBuilder("js")
+	public JsWorkingSpace createWorkingSpace(File codeDirectory) {
+		return new JsWorkingSpace(Context.newBuilder("js")
 				.engine(engine)
                 .allowAllAccess(true)
                 .option("js.commonjs-require", "true")
@@ -39,22 +38,21 @@ public class ApidechJavaJsRuntime {
                 .build());
 	}
 	
-	public JsContext createContext() {
-		return new JsContext(Context.newBuilder("js")
+	public JsWorkingSpace createWorkingSpace() {
+		return new JsWorkingSpace(Context.newBuilder("js")
 				.engine(engine)
                 .build());
 	}
 	
 	public void singleEval(JsRunnable runnable, File jsCode) throws IOException {
-		JsSource source = null;
-		source = createSource(jsCode);
+		JsSource source = JsSource.create(jsCode);
 		singleEval(runnable, source);
 	}
 	
 	public void singleEval(JsRunnable runnable, CharSequence jsCode) {
 		JsSource source = null;
 		try {
-			source = createSource(jsCode);
+			source = JsSource.create(jsCode);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -64,7 +62,7 @@ public class ApidechJavaJsRuntime {
 	}
 	
 	public void singleEval(JsRunnable runnable, JsSource source) {
-		JsContext context = createContext();
+		JsWorkingSpace context = createWorkingSpace();
 		JsResult jsResult = new JsResult();
 		try {
 			jsResult.result = context.eval(source);
@@ -103,24 +101,6 @@ public class ApidechJavaJsRuntime {
             ctx.eval("js", "console.log('Hello', 'from', 'GraalVM');");
         }
 	 */
-	
-	public JsSource createSource(File jsFile) throws IOException {
-		return new JsSource(Source.newBuilder("js", jsFile).build());
-	}
-	
-	public JsSource createSource(CharSequence jsCode) {
-		try {
-			return createSource(jsCode, null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//Should not be here at all, since no I/O
-		return null;
-	}
-	
-	public JsSource createSource(CharSequence jsCode, String name) throws IOException {
-		return new JsSource(Source.newBuilder("js", jsCode, name).build());
-	}
 	
 	//--- ETC Methods
 	public void shutdown() {

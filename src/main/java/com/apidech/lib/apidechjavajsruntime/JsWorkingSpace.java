@@ -3,11 +3,11 @@ package com.apidech.lib.apidechjavajsruntime;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
-public class JsContext {
+public class JsWorkingSpace {
 	
 	private Context context;
 	
-	public JsContext(Context context) {
+	public JsWorkingSpace(Context context) {
 		this.context = context;
 	}
 	
@@ -19,8 +19,12 @@ public class JsContext {
 		return context.eval(source.getSource());
 	}
 	
-	public Object executeFunction(String functionName) {
-		return null;
+	public JsClass runCompileClass(JsSource source) {
+		return new JsClass(context, context.eval(source.getSource()));
+	}
+	
+	public JsFile runCompileSource(JsSource source) {
+		return new JsFile(context, context.eval(source.getSource()));
 	}
 	
 	public boolean isFunctionExists() {
