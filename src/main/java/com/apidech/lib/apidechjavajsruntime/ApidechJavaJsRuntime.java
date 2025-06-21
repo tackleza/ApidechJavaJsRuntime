@@ -83,24 +83,9 @@ public class ApidechJavaJsRuntime {
 		}
 	}
 	
-	//Setup Context allow to define option for example .js lookup
-	//Option to check for typescript; and tsc compile
-	//Design another set of class. Js and Ts 
-	
-	//Function Lookup and tools
-	
-	//Create Source
-	
-	/*
-	 * Find the smartway to capture the console output, maybe callback?
-	 * try (Context ctx = Context.newBuilder("js")
-                                  .out(capture)
-                                  .err(capture)       // optional: capture console.error too
-                                  .build()) {
-            // 3) Run JS that uses console.log()
-            ctx.eval("js", "console.log('Hello', 'from', 'GraalVM');");
-        }
-	 */
+	public static TypeScriptCompiler compileTypeScript(File rootDir) {
+		return new TypeScriptCompiler(rootDir);
+	}
 	
 	//--- ETC Methods
 	public void shutdown() {
