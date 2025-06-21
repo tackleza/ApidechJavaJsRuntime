@@ -3,6 +3,7 @@ package com.apidech.lib.apidechjavajsruntime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.graalvm.polyglot.PolyglotException;
@@ -60,4 +61,12 @@ public class JsFunction {
                      .map(String::trim)
                      .collect(Collectors.toList());
     }
+	
+	public String getName() {
+		return fn.getMember("name").asString();
+	}
+	
+	public Set<String> getMembers() {
+		return fn.getMemberKeys();
+	}
 }

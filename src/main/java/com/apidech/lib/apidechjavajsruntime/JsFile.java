@@ -1,5 +1,6 @@
 package com.apidech.lib.apidechjavajsruntime;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.graalvm.polyglot.Context;
@@ -26,15 +27,37 @@ public class JsFile {
 	}
 	
 	public JsFunction getFunction(String functionName) {
-		return new JsFunction(binding.getMember(functionName));
+		Value value = binding.getMember(functionName);
+		if(!value.canExecute()) {
+			return null;
+		}
+		return new JsFunction(value);
 	}
 	
 	public boolean hasFunction(String functionName) {
-		return binding.canInvokeMember(functionName);
+		return getFunction(functionName) != null;
 	}
 	
-	public Set<String> getFunctions() {
-		return binding.getMemberKeys();
+	public Set<String> getFunctionNames() {
+		Set<String> found = new HashSet<>();
+		for(String memberKey : binding.getMemberKeys()) {
+			Value value = binding.getMember(memberKey);
+			if(value.canExecute()) {
+				found.add(memberKey);
+			}
+		}
+		return found;
+	}
+	
+	public Set<JsFunction> getFunctions() {
+		Set<JsFunction> found = new HashSet<>();
+		for(String memberKey : binding.getMemberKeys()) {
+			Value value = binding.getMember(memberKey);
+			if(value.canExecute()) {
+				found.add(getFunction(memberKey));
+			}
+		}
+		return found;
 	}
 	
 	public Value getBinding() {

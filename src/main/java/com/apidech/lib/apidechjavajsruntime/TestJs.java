@@ -14,6 +14,19 @@ public class TestJs {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		jsFile.getFunction("hello").executeVoid("Tackle");
+		for(String name : jsFile.getFunction("hello").getMembers()) {
+			System.out.println("- "+name);
+		}
+		
+//		System.out.println(jsFile.getFunction("hello").getName());
+		
+//		try {
+//			JsClass jsClass = working.runCompileClass(JsSource.create(new File("testjs/animal.js")));
+//			for(String name : jsClass.getFunctions()) {
+//				System.out.println(name);
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 }
