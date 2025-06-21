@@ -1,4 +1,4 @@
-package com.apidech.lib.apidechjavajsruntime;
+package com.apidech.lib.apidechjavajsruntime.js;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.apidech.lib.apidechjavajsruntime;
+package com.apidech.lib.apidechjavajsruntime.js;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,25 +17,24 @@ public class JsFunction {
 	}
 	
 	public JsResult executeVoid(Object... arguments) {
-		JsResult result = new JsResult();
+		JsResult result = null;
 		try {
 			fn.executeVoid(arguments);
-			result.isSuccess = true;
+			result = new JsResult((Value)null);
 		}
 		catch (PolyglotException e) {
-			result.exception = e;
+			result = new JsResult(e);
 		}
 		return result;
 	}
 	
 	public JsResult execute(Object... arguments) {
-		JsResult result = new JsResult();
+		JsResult result = null;
 		try {
-			result.result = fn.execute(arguments);
-			result.isSuccess = true;
+			result = new JsResult(fn.execute(arguments));
 		}
 		catch (PolyglotException e) {
-			result.exception = e;
+			result = new JsResult(e);
 		}
 		return result;
 	}

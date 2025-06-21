@@ -1,4 +1,4 @@
-package com.apidech.lib.apidechjavajsruntime;
+package com.apidech.lib.apidechjavajsruntime.js;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;

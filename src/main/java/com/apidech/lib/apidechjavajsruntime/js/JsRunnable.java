@@ -1,4 +1,4 @@
-package com.apidech.lib.apidechjavajsruntime;
+package com.apidech.lib.apidechjavajsruntime.js;
 
 public interface JsRunnable {
 	

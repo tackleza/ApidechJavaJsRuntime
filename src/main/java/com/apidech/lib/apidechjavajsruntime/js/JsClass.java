@@ -1,4 +1,4 @@
-package com.apidech.lib.apidechjavajsruntime;
+package com.apidech.lib.apidechjavajsruntime.js;
 
 import java.io.IOException;
 import java.util.ArrayList;

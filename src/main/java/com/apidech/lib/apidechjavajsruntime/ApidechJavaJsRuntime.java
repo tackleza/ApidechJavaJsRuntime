@@ -8,6 +8,13 @@ import java.util.Map.Entry;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.Engine.Builder;
+
+import com.apidech.lib.apidechjavajsruntime.js.JsResult;
+import com.apidech.lib.apidechjavajsruntime.js.JsRunnable;
+import com.apidech.lib.apidechjavajsruntime.js.JsSource;
+import com.apidech.lib.apidechjavajsruntime.js.JsWorkingSpace;
+import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompiler;
+
 import org.graalvm.polyglot.PolyglotException;
 
 public class ApidechJavaJsRuntime {
@@ -63,13 +70,12 @@ public class ApidechJavaJsRuntime {
 	
 	public void singleEval(JsRunnable runnable, JsSource source) {
 		JsWorkingSpace context = createWorkingSpace();
-		JsResult jsResult = new JsResult();
+		JsResult jsResult = null;
 		try {
-			jsResult.result = context.eval(source);
-			jsResult.isSuccess = true;
+			jsResult = new JsResult(context.eval(source));
 		}
 		catch (PolyglotException e) {
-			jsResult.exception = e;
+			jsResult = new JsResult(e);
 		}
 		
 		try {

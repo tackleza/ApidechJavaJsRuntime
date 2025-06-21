@@ -1,4 +1,4 @@
-package com.apidech.lib.apidechjavajsruntime;
+package com.apidech.lib.apidechjavajsruntime.ts;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TypeScriptCompiler {
+	
     private final File rootTsProjectDir;
     private String lastOutput;
 
@@ -97,6 +98,10 @@ public class TypeScriptCompiler {
      */
     public String getLastOutput() {
         return lastOutput;
+    }
+    
+    public static TypeScriptCompiler builder(File rootTsProjectDir) {
+    	return new TypeScriptCompiler(rootTsProjectDir);
     }
 
     /**
