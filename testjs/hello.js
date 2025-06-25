@@ -1,5 +1,5 @@
 function hello(name) {
-  console.log(`Hello, ${name}!`);
+  console.log(`[JS] Hello, ${name}!`);
 }
 
 // Example usage

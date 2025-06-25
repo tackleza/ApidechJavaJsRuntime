@@ -19,11 +19,7 @@ public class JsWorkingSpace {
 		return context.eval(source.getSource());
 	}
 	
-	public JsClass runCompileClass(JsSource source) {
-		return new JsClass(context, context.eval(source.getSource()));
-	}
-	
-	public JsFile runCompileSource(JsSource source) {
+	public JsFile compile(JsSource source) {
 		return new JsFile(context, context.eval(source.getSource()));
 	}
 	

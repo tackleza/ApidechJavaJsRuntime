@@ -9,35 +9,25 @@ import java.util.List;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
-public class JsClass extends JsFile {
+public class JsClass extends JsAbstract {
 
-	public JsClass(Context context, Value value) {
-		super(context, value);
+	private Context context;
+	private Value jsClass;
+	
+	public JsClass(Context context, Value clazz) {
+		super(context);
+		this.jsClass = clazz;
 	}
 	
 	/**
-     * @return all top-level JS constructors
-     */
-    public List<String> getClasses() throws IOException {
-        Context ctx = getContext();
-        Value bindings = ctx.getBindings("js");
-        List<String> found = new ArrayList<>();
-        for (String key : bindings.getMemberKeys()) {
-            Value val = bindings.getMember(key);
-            if (val.canInstantiate()) {
-            	found.add(key);
-            }
-        }
-        return found;
-    }
-	
-	/**
-     * @param className      the JS constructor name (e.g. "Cat")
      * @param superClassName the JS constructor it should extend (e.g. "Animal")
      * @return true if superClass.prototype is in className.prototype’s chain
      */
-	public boolean isInstanceOf(String className, String superClassName) {
-        Value bindings = getBinding();
+	public boolean isInstanceOf(String superClassName) {
+		
+		String className = jsClass.getMember("name").asString();
+		
+        Value bindings = context.getBindings("js");
         if (!bindings.hasMember(className) || !bindings.hasMember(superClassName)) {
             throw new IllegalArgumentException(
               "Class not found: " + className + " or " + superClassName
@@ -55,27 +45,25 @@ public class JsClass extends JsFile {
 	/**
      * Returns the name of the superclass of the given JS class (or null if none).
      */
-    public String getExtendedClassName(String className) throws IOException {
-        Value bindings = getContext().getBindings("js");
-        Value ctor = bindings.getMember(className);
-        if (ctor == null) {
-            throw new IllegalArgumentException("Class not found: " + className);
-        }
+    public String getExtendedClassName() {
         // In JS, a class's [[Prototype]] (accessible as __proto__) points to its superclass constructor
-        Value superCtor = ctor.getMember("__proto__");
+        Value superCtor = jsClass.getMember("__proto__");
         if (superCtor == null || superCtor.isNull()) {
             return null;
         }
         return superCtor.getMember("name").asString();
     }
+    
+    public boolean isExtendedClass() {
+    	String extended = getExtendedClassName();
+    	return extended != null && !extended.isEmpty();
+    }
 
     /**
      * Lists all instance method names declared directly on the class prototype.
      */
-    public List<String> getMethods(String className) throws IOException {
-        Value proto = getContext().getBindings("js")
-                                  .getMember(className)
-                                  .getMember("prototype");
+    public List<String> getMethodNames() throws IOException {
+        Value proto = jsClass.getMember("prototype");
         List<String> methods = new ArrayList<>();
         for (String key : proto.getMemberKeys()) {
             Value member = proto.getMember(key);
@@ -90,23 +78,19 @@ public class JsClass extends JsFile {
     /**
      * Checks if a class prototype has a callable member with the given name.
      */
-    public boolean hasMethod(String className, String methodName) throws IOException {
-        Value proto = getContext().getBindings("js")
-                                  .getMember(className)
-                                  .getMember("prototype");
+    public boolean hasMethod(String methodName) throws IOException {
+        Value proto = jsClass.getMember("prototype");
         return proto.hasMember(methodName) && proto.getMember(methodName).canExecute();
     }
 
     /**
      * Returns the declared parameter count of a class's instance method.
      */
-    public int getMethodArgsCount(String className, String methodName) throws IOException {
-        if (!hasMethod(className, methodName)) {
-            throw new IllegalArgumentException("Method '" + methodName + "' not found on '" + className + "'");
+    public int getMethodArgsCount(String methodName) throws IOException {
+        if (!hasMethod(methodName)) {
+            throw new IllegalArgumentException("Method '" + methodName + "' not found on '" + getName() + "'");
         }
-        Value fn = getContext().getBindings("js")
-                      .getMember(className)
-                      .getMember("prototype")
+        Value fn = jsClass.getMember("prototype")
                       .getMember(methodName);
         return fn.getMember("length").asInt();
     }
@@ -114,13 +98,11 @@ public class JsClass extends JsFile {
     /**
      * Returns the list of declared parameter names for a class's instance method.
      */
-    public List<String> getMethodArgsNames(String className, String methodName) throws IOException {
-        if (!hasMethod(className, methodName)) {
-            throw new IllegalArgumentException("Method '" + methodName + "' not found on '" + className + "'");
+    public List<String> getMethodArgsNames(String methodName) throws IOException {
+        if (!hasMethod(methodName)) {
+            throw new IllegalArgumentException("Method '" + methodName + "' not found on '" + getName() + "'");
         }
-        Value fn = getContext().getBindings("js")
-                      .getMember(className)
-                      .getMember("prototype")
+        Value fn = jsClass.getMember("prototype")
                       .getMember(methodName);
         String src = fn.invokeMember("toString").asString();
         int start = src.indexOf('(') + 1;
@@ -135,5 +117,29 @@ public class JsClass extends JsFile {
         return Arrays.stream(params.split(","))
                      .map(String::trim)
                      .toList();
+    }
+    
+    public JsClassInstance newInstance(Object... arguments) {
+    	return new JsClassInstance(this, jsClass, jsClass.newInstance(arguments));
+    }
+    
+    public JsClassInstance tryNewInstance(Object... arguments) {
+    	try {
+    		return new JsClassInstance(this, jsClass, jsClass.newInstance(arguments));
+    	}
+    	catch (Exception e) {}
+    	return null;
+    }
+    
+    public boolean canInstantiate() {
+    	return jsClass.canInstantiate();
+    }
+    
+    /**
+     * Get the class name of javascript
+     * @return js class name
+     */
+    public String getName() {
+    	return jsClass.getMember("name").asString();
     }
 }

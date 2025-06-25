@@ -18,7 +18,6 @@ public class JsSource {
 	}
 	
 	public static JsSource create(File jsFile) throws IOException {
-		System.out.println("create: "+jsFile.getAbsolutePath());
 		return new JsSource(Source.newBuilder("js", jsFile).build());
 	}
 	

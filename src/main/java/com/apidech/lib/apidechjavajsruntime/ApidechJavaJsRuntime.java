@@ -14,6 +14,7 @@ import com.apidech.lib.apidechjavajsruntime.js.JsRunnable;
 import com.apidech.lib.apidechjavajsruntime.js.JsSource;
 import com.apidech.lib.apidechjavajsruntime.js.JsWorkingSpace;
 import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompiler;
+import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompiler.CompilationException;
 
 import org.graalvm.polyglot.PolyglotException;
 
@@ -89,8 +90,8 @@ public class ApidechJavaJsRuntime {
 		}
 	}
 	
-	public static TypeScriptCompiler compileTypeScript(File rootDir) {
-		return new TypeScriptCompiler(rootDir);
+	public static String compileTypeScript(File rootDir) throws IOException, InterruptedException, CompilationException {
+		return new TypeScriptCompiler(rootDir).compile();
 	}
 	
 	//--- ETC Methods

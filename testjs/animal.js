@@ -41,6 +41,10 @@ class Cat extends Animal {
   talk() {
     console.log(`${this.name} says: Meow!`);
   }
+
+  meow() {
+    console.log(`${this.name} is meow!.`);
+  }
 }
 
 // Export for Node.js

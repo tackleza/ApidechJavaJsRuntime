@@ -1,29 +1,25 @@
 package com.apidech.lib.apidechjavajsruntime.js;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
-public class JsFile {
+public class JsFile extends JsAbstract {
 
-	private Context context;
 	private Value result;
 	private Value binding;
 	
 	public JsFile(Context context, Value result) {
-		this.context = context;
+		super(context);
 		this.result = result;
 		this.binding = context.getBindings("js");
 	}
 	
 	public Value getResult() {
 		return result;
-	}
-	
-	public Context getContext() {
-		return context;
 	}
 	
 	public JsFunction getFunction(String functionName) {
@@ -64,4 +60,25 @@ public class JsFile {
 		return binding;
 	}
 	
+	/**
+     * @return all top-level JS constructors
+     */
+    public Set<JsClass> getClasses() throws IOException {
+    	Set<JsClass> found = new HashSet<>();
+		for(String memberKey : binding.getMemberKeys()) {
+			Value value = binding.getMember(memberKey);
+			if(value.canInstantiate()) {
+				found.add(getClass(memberKey));
+			}
+		}
+		return found;
+    }
+    
+    public JsClass getClass(String className) {
+    	Value clazz = binding.getMember(className);
+    	if(!clazz.canInstantiate()) {
+    		throw new RuntimeException("[JS] "+className+" is not a class");
+    	}
+    	return new JsClass(getContext(), clazz);
+    }
 }
