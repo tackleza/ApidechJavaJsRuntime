@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompiler;
-import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompiler.CompilationException;
 
 public class TestTs {
 	
@@ -19,9 +18,6 @@ public class TestTs {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CompilationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

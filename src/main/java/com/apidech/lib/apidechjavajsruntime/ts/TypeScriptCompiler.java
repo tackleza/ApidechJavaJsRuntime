@@ -2,15 +2,20 @@ package com.apidech.lib.apidechjavajsruntime.ts;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompileResult.Result;
+
 public class TypeScriptCompiler {
 	
     private final File rootTsProjectDir;
-    private String lastOutput;
 
     /**
      * @param rootTsProjectDir the working directory in which tsc will be run
@@ -31,16 +36,16 @@ public class TypeScriptCompiler {
      * @throws InterruptedException if the current thread is interrupted while waiting
      * @throws CompilationException if tsc returns a non-zero exit code
      */
-    public String compile() throws IOException, InterruptedException, CompilationException {
-        // Ensure 'tsc' is available before attempting compilation
+    public TypeScriptCompileResult compile() throws IOException, InterruptedException {
         ensureTscAvailable();
+        File outputDir = getOutputDir();
 
         List<String> cmd = new ArrayList<>();
-        cmd.add("tsc"); // rely on tsconfig.json for file list and options
+        cmd.add("tsc");
 
         ProcessBuilder pb = new ProcessBuilder(cmd)
                 .directory(rootTsProjectDir)
-                .redirectErrorStream(true); // merge stderr into stdout
+                .redirectErrorStream(true);
 
         Process process = pb.start();
 
@@ -52,18 +57,38 @@ public class TypeScriptCompiler {
                 output.append(line).append(System.lineSeparator());
             }
         }
-
-        int exitCode = process.waitFor();
-        lastOutput = output.toString();
-
-        if (exitCode != 0) {
-            throw new CompilationException(
-                    "tsc exited with code " + exitCode, exitCode, lastOutput);
+        if (process.waitFor() != 0) {
+        	return new TypeScriptCompileResult(null, Result.FAILED, output.toString());
         }
-
-        return lastOutput;
+        return new TypeScriptCompileResult(outputDir, Result.SUCCESS, null);
     }
 
+    public File getOutputDir() {
+        try {
+        	
+        	File tsConfigFile = new File(rootTsProjectDir, "tsconfig.json");
+        	
+            JSONParser parser = new JSONParser();
+            JSONObject root = (JSONObject) parser.parse(new FileReader(tsConfigFile));
+
+            JSONObject compilerOptions = (JSONObject) root.get("compilerOptions");
+            if (compilerOptions == null) {
+                return null;
+            }
+
+            boolean hasRootDir = compilerOptions.containsKey("rootDir");
+            boolean hasOutDir = compilerOptions.containsKey("outDir");
+
+            if(!hasRootDir || !hasOutDir) {
+            	return null;
+            }
+            
+            return new File(rootTsProjectDir, compilerOptions.get("outDir").toString());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
     /**
      * Checks that the TypeScript compiler ('tsc') is installed and accessible on the PATH.
      *
@@ -93,39 +118,7 @@ public class TypeScriptCompiler {
         }
     }
 
-    /**
-     * @return the output from the most recent compile() invocation (stdout + stderr)
-     */
-    public String getLastOutput() {
-        return lastOutput;
-    }
-    
     public static TypeScriptCompiler builder(File rootTsProjectDir) {
     	return new TypeScriptCompiler(rootTsProjectDir);
-    }
-
-    /**
-     * Exception thrown when the TypeScript compiler returns a non-zero exit code.
-     */
-    public static class CompilationException extends Exception {
-        private static final long serialVersionUID = -8154967423501029610L;
-        private final int exitCode;
-        private final String compilerOutput;
-
-        public CompilationException(String message, int exitCode, String compilerOutput) {
-            super(message);
-            this.exitCode = exitCode;
-            this.compilerOutput = compilerOutput;
-        }
-
-        /** @return the exit code returned by tsc */
-        public int getExitCode() {
-            return exitCode;
-        }
-
-        /** @return the full stdout+stderr emitted by tsc */
-        public String getCompilerOutput() {
-            return compilerOutput;
-        }
     }
 }

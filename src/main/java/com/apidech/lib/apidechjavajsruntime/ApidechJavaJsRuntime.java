@@ -8,15 +8,14 @@ import java.util.Map.Entry;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.Engine.Builder;
+import org.graalvm.polyglot.PolyglotException;
 
 import com.apidech.lib.apidechjavajsruntime.js.JsResult;
 import com.apidech.lib.apidechjavajsruntime.js.JsRunnable;
 import com.apidech.lib.apidechjavajsruntime.js.JsSource;
 import com.apidech.lib.apidechjavajsruntime.js.JsWorkingSpace;
+import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompileResult;
 import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompiler;
-import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompiler.CompilationException;
-
-import org.graalvm.polyglot.PolyglotException;
 
 public class ApidechJavaJsRuntime {
 	
@@ -90,7 +89,7 @@ public class ApidechJavaJsRuntime {
 		}
 	}
 	
-	public static String compileTypeScript(File rootDir) throws IOException, InterruptedException, CompilationException {
+	public static TypeScriptCompileResult compileTypeScript(File rootDir) throws IOException, InterruptedException {
 		return new TypeScriptCompiler(rootDir).compile();
 	}
 	
