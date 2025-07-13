@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import org.graalvm.polyglot.PolyglotException;
 import org.graalvm.polyglot.Value;
 
+import com.apidech.lib.apidechjavajsruntime.misc.MemberValue;
+
 public class JsFunction {
 	
 	private Value fn;
@@ -20,7 +22,7 @@ public class JsFunction {
 		JsResult result = null;
 		try {
 			fn.executeVoid(arguments);
-			result = new JsResult((Value)null);
+			result = new JsResult((MemberValue)null);
 		}
 		catch (PolyglotException e) {
 			result = new JsResult(e);
@@ -31,7 +33,7 @@ public class JsFunction {
 	public JsResult execute(Object... arguments) {
 		JsResult result = null;
 		try {
-			result = new JsResult(fn.execute(arguments));
+			result = new JsResult(new MemberValue(fn.execute(arguments)));
 		}
 		catch (PolyglotException e) {
 			result = new JsResult(e);

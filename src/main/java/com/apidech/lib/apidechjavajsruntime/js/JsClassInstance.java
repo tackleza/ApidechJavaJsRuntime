@@ -1,5 +1,8 @@
 package com.apidech.lib.apidechjavajsruntime.js;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.graalvm.polyglot.Value;
 
 public class JsClassInstance extends JsClass {
@@ -19,24 +22,13 @@ public class JsClassInstance extends JsClass {
 		return new JsClassInstanceMethod(this, method);
 	}
 	
-//	public boolean hasMedthod(String methodName) {
-//		return value.canInvokeMember(methodName);
-//	}
-//	
-//	public HashSet<JsClassInstanceMethod> getMethods() {
-//		System.out.println("getMethods()");
-//		HashSet<JsClassInstanceMethod> methods = new HashSet<>();
-//		for(String key : value.getMemberKeys()) {
-//			Value method = value.getMember(key);
-//			if(method.canInvokeMember(key)){
-//				methods.add(getMethod(key));
-//			}
-//		}
-//		System.out.println("=== getMethods()");
-//		return methods;
-//	}
-//	
-//	public String getName() {
-//		return getJsClass().getName();
-//	}
+	public Set<JsClassInstanceMethod> getMethods() {
+		Set<String> methodNames = getMethodNames();
+		HashSet<JsClassInstanceMethod> methods = new HashSet<>();
+		for(String name : methodNames) {
+			Value method = instance.getMember(name);
+			methods.add(new JsClassInstanceMethod(this, method));
+		}
+		return methods;
+	}
 }

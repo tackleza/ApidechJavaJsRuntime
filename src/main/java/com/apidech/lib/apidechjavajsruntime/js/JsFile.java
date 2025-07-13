@@ -7,6 +7,8 @@ import java.util.Set;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
+import com.apidech.lib.apidechjavajsruntime.misc.MemberValue;
+
 public class JsFile extends JsAbstract {
 
 	private Value result;
@@ -81,4 +83,38 @@ public class JsFile extends JsAbstract {
     	}
     	return new JsClass(getContext(), clazz);
     }
+
+    public MemberValue getVarSafe(String varName) {
+    	try {
+    		return getVar(varName);
+    	}
+    	catch (Exception e) {}
+    	return null;
+    }
+    
+	public MemberValue getVar(String varName) {
+		Value member = binding.getMember(varName);
+		if (member == null) {
+	        throw new IllegalArgumentException("No such global: " + varName);
+	    }
+		MemberValue value = new MemberValue(member);
+			
+		if (value.isFunction()) {
+	        throw new IllegalArgumentException("'" + varName + "' is a function, not a variable");
+	    }
+		return value;
+	}
+
+	public Set<MemberValue> getVars() {
+		Set<MemberValue> found = new HashSet<>();
+		for(String memberKey : binding.getMemberKeys()) {
+			Value value = binding.getMember(memberKey);
+			if(value.canInstantiate()) {
+				continue;
+			}
+			MemberValue memberValue = new MemberValue(value, memberKey);
+			found.add(memberValue);
+		}
+		return found;
+	}
 }

@@ -14,6 +14,7 @@ import com.apidech.lib.apidechjavajsruntime.js.JsResult;
 import com.apidech.lib.apidechjavajsruntime.js.JsRunnable;
 import com.apidech.lib.apidechjavajsruntime.js.JsSource;
 import com.apidech.lib.apidechjavajsruntime.js.JsWorkingSpace;
+import com.apidech.lib.apidechjavajsruntime.misc.MemberValue;
 import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompileResult;
 import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompiler;
 
@@ -72,7 +73,7 @@ public class ApidechJavaJsRuntime {
 		JsWorkingSpace context = createWorkingSpace();
 		JsResult jsResult = null;
 		try {
-			jsResult = new JsResult(context.eval(source));
+			jsResult = new JsResult(new MemberValue(context.eval(source)));
 		}
 		catch (PolyglotException e) {
 			jsResult = new JsResult(e);

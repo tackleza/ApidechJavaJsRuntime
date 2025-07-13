@@ -9,6 +9,7 @@ public class JsClassInstanceMethod {
 	
 	public JsClassInstanceMethod(JsClassInstance jsClassInstance, Value method) {
 		this.jsClassInstance = jsClassInstance;
+		this.method = method;
 	}
 	
 	public JsClassInstance getJsClassInstance() {

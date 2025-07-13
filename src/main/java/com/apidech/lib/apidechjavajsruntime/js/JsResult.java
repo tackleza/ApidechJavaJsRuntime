@@ -1,15 +1,16 @@
 package com.apidech.lib.apidechjavajsruntime.js;
 
 import org.graalvm.polyglot.PolyglotException;
-import org.graalvm.polyglot.Value;
+
+import com.apidech.lib.apidechjavajsruntime.misc.MemberValue;
 
 public class JsResult {
 	
 	private boolean isSuccess;
-	private Value result;
+	private MemberValue result;
 	private PolyglotException exception;
 	
-	public JsResult(Value result) {
+	public JsResult(MemberValue result) {
 		this.isSuccess = true;
 		this.result = result;
 	}
@@ -23,7 +24,7 @@ public class JsResult {
 		return isSuccess;
 	}
 	
-	public Value getResult() {
+	public MemberValue getResult() {
 		return result;
 	}
 	

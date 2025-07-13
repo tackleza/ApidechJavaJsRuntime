@@ -1,5 +1,3 @@
-// animal.js
-
 /**
  * Abstract base class Animal with two abstract methods: walk() and talk().
  */
@@ -45,9 +43,4 @@ class Cat extends Animal {
   meow() {
     console.log(`${this.name} is meow!.`);
   }
-}
-
-// Export for Node.js
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { Animal, Cat };
 }
