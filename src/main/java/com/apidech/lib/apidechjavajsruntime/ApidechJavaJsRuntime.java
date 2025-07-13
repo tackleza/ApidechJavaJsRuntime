@@ -9,6 +9,7 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
 import org.graalvm.polyglot.Engine.Builder;
 import org.graalvm.polyglot.PolyglotException;
+import org.graalvm.polyglot.io.IOAccess;
 
 import com.apidech.lib.apidechjavajsruntime.js.JsResult;
 import com.apidech.lib.apidechjavajsruntime.js.JsRunnable;
@@ -36,21 +37,35 @@ public class ApidechJavaJsRuntime {
 		this.engine = builder.build();
 	}
 	
-	//Create Context
-	public JsWorkingSpace createWorkingSpace(File codeDirectory) {
-		return new JsWorkingSpace(Context.newBuilder("js")
-				.engine(engine)
-                .allowAllAccess(true)
-                .option("js.commonjs-require", "true")
-                .option("js.commonjs-require-cwd", codeDirectory.getAbsolutePath())
-                .build());
-	}
+	/**
+     * Creates a working space that can resolve CommonJS requires and ES modules
+     * from the given code directory.
+     * Enables file I/O, CommonJS require, and ESM evaluation.
+     */
+    public JsWorkingSpace createWorkingSpace(File codeDirectory) {
+        Context ctx = Context.newBuilder("js")
+            .engine(engine)
+            .allowAllAccess(true)
+            .allowIO(IOAccess.ALL)
+            .allowExperimentalOptions(true)
+            // CommonJS support
+            .option("js.commonjs-require", "true")
+            .option("js.commonjs-require-cwd", codeDirectory.getAbsolutePath())
+            // ES Module support: return module exports
+            .option("js.esm-eval-returns-exports", "true")
+            .build();
+        return new JsWorkingSpace(ctx);
+    }
 	
-	public JsWorkingSpace createWorkingSpace() {
-		return new JsWorkingSpace(Context.newBuilder("js")
-				.engine(engine)
-                .build());
-	}
+    /**
+     * Creates a simple working space without file I/O or import support.
+     */
+    public JsWorkingSpace createWorkingSpace() {
+        Context ctx = Context.newBuilder("js")
+            .engine(engine)
+            .build();
+        return new JsWorkingSpace(ctx);
+    }
 	
 	public void singleEval(JsRunnable runnable, File jsCode) throws IOException {
 		JsSource source = JsSource.create(jsCode);

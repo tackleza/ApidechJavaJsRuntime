@@ -18,7 +18,12 @@ public class JsSource {
 	}
 	
 	public static JsSource create(File jsFile) throws IOException {
-		return new JsSource(Source.newBuilder("js", jsFile).build());
+	    String mime = "application/javascript+module";
+	    Source src = Source.newBuilder("js", jsFile)
+	                       .mimeType(mime)
+	                       .uri(jsFile.toURI())
+	                       .build();
+	    return new JsSource(src);
 	}
 	
 	public static JsSource create(CharSequence jsCode) {

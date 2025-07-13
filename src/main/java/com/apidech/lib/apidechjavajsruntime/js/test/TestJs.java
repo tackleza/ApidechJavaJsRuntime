@@ -1,5 +1,11 @@
 package com.apidech.lib.apidechjavajsruntime.js.test;
 
+import java.io.File;
+
+import com.apidech.lib.apidechjavajsruntime.ApidechJavaJsRuntime;
+import com.apidech.lib.apidechjavajsruntime.js.JsSource;
+import com.apidech.lib.apidechjavajsruntime.js.JsWorkingSpace;
+
 public class TestJs {
 
 	public static void main(String[] args) {
@@ -9,6 +15,18 @@ public class TestJs {
 //		testGlobalFunction(working);
 //		testClass(working);
 //		testClassMember(working);
+		testClassImport();
+	}
+
+	private static void testClassImport() {
+		try {
+			ApidechJavaJsRuntime runtime = new ApidechJavaJsRuntime();
+			JsWorkingSpace working = runtime.createWorkingSpace(new File("testjs"));
+			working.compile(JsSource.create(new File("testjs/testimport.js")));
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 //	private static void testClassMember(JsWorkingSpace working) {
