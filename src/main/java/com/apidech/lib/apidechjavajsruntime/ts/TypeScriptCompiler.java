@@ -2,14 +2,14 @@ package com.apidech.lib.apidechjavajsruntime.ts;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.apidech.lib.apidechjavajsruntime.ts.TypeScriptCompileResult.Result;
 
@@ -65,25 +65,21 @@ public class TypeScriptCompiler {
 
     public File getOutputDir() {
         try {
-        	
-        	File tsConfigFile = new File(rootTsProjectDir, "tsconfig.json");
-        	
-            JSONParser parser = new JSONParser();
-            JSONObject root = (JSONObject) parser.parse(new FileReader(tsConfigFile));
+            File tsConfigFile = new File(rootTsProjectDir, "tsconfig.json");
 
-            JSONObject compilerOptions = (JSONObject) root.get("compilerOptions");
+            ObjectMapper mapper = new ObjectMapper()
+                .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
+                .configure(JsonParser.Feature.ALLOW_TRAILING_COMMA, true);
+
+            JsonNode root = mapper.readTree(tsConfigFile);
+            JsonNode compilerOptions = root.get("compilerOptions");
             if (compilerOptions == null) {
                 return null;
             }
-
-            boolean hasRootDir = compilerOptions.containsKey("rootDir");
-            boolean hasOutDir = compilerOptions.containsKey("outDir");
-
-            if(!hasRootDir || !hasOutDir) {
-            	return null;
+            if (!compilerOptions.has("rootDir") || !compilerOptions.has("outDir")) {
+                return null;
             }
-            
-            return new File(rootTsProjectDir, compilerOptions.get("outDir").toString());
+            return new File(rootTsProjectDir, compilerOptions.get("outDir").asText());
         } catch (Exception e) {
             return null;
         }

@@ -21,25 +21,23 @@ public class JsClass extends JsAbstract {
 	
 	/**
      * @param superClassName the JS constructor it should extend (e.g. "Animal")
-     * @return true if superClass.prototype is in className.prototype’s chain
+     * @return true if superClass.prototype is in this class's prototype chain
      */
 	public boolean isInstanceOf(String superClassName) {
-		
-		String className = jsClass.getMember("name").asString();
-		
         Value bindings = getContext().getBindings("js");
-        if (!bindings.hasMember(className) || !bindings.hasMember(superClassName)) {
-            throw new IllegalArgumentException(
-              "Class not found: " + className + " or " + superClassName
-            );
+        Value superCtor = bindings.getMember(superClassName);
+        if (superCtor == null || !superCtor.canInstantiate()) {
+            throw new IllegalArgumentException("Class not found: " + superClassName);
         }
-        // Evaluate Animal.prototype.isPrototypeOf(Cat.prototype)
-        String expr = String.format(
-          "%s.prototype.isPrototypeOf(%s.prototype)",
-          superClassName, className
-        );
-        Value result = getContext().eval("js", expr);
-        return result.asBoolean();
+        Value superProto = superCtor.getMember("prototype");
+        Value thisProto = jsClass.getMember("prototype");
+        if (superProto == null || thisProto == null) {
+            return false;
+        }
+        // Build once, reuse: (sp, tp) => sp.isPrototypeOf(tp)
+        Value isPrototypeOf = getContext().eval("js",
+            "(sp, tp) => sp.isPrototypeOf(tp)");
+        return isPrototypeOf.execute(superProto, thisProto).asBoolean();
     }
 	
 	/**

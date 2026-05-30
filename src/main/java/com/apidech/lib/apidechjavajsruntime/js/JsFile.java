@@ -26,7 +26,7 @@ public class JsFile extends JsAbstract {
 	
 	public JsFunction getFunction(String functionName) {
 		Value value = binding.getMember(functionName);
-		if(!value.canExecute()) {
+		if(value == null || !value.canExecute()) {
 			return null;
 		}
 		return new JsFunction(value);

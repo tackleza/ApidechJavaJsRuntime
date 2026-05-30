@@ -23,8 +23,9 @@ public class JsWorkingSpace {
 		return new JsFile(context, context.eval(source.getSource()));
 	}
 	
-	public boolean isFunctionExists() {
-		return false;
+	public boolean hasFunction(String name) {
+		Value member = context.getBindings("js").getMember(name);
+		return member != null && member.canExecute();
 	}
 	
 	public void close() {

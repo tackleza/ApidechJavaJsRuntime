@@ -73,32 +73,24 @@ public class ApidechJavaJsRuntime {
 	}
 	
 	public void singleEval(JsRunnable runnable, CharSequence jsCode) {
-		JsSource source = null;
-		try {
-			source = JsSource.create(jsCode);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		// Need to find better way to return result since it's need to close context.
-		singleEval(runnable, source);
+		singleEval(runnable, JsSource.create(jsCode));
 	}
-	
+
 	public void singleEval(JsRunnable runnable, JsSource source) {
 		JsWorkingSpace context = createWorkingSpace();
-		JsResult jsResult = null;
+		JsResult jsResult;
 		try {
 			jsResult = new JsResult(new MemberValue(context.eval(source)));
 		}
 		catch (PolyglotException e) {
 			jsResult = new JsResult(e);
 		}
-		
+		catch (Throwable t) {
+			jsResult = new JsResult(t);
+		}
+
 		try {
 			runnable.run(jsResult);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
 		}
 		finally {
 			context.close();
